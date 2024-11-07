@@ -1,5 +1,6 @@
 ﻿@*@model IEnumerable<lab8.Models.Product>*@
 @model lab8.ViewModels.ProductIndexViewModel
+@using PagedList.Mvc
 
 @{
     //ViewBag.Title = "Index";
@@ -9,14 +10,17 @@
 <h2>Index</h2>
 
 <p>
+    @(String.IsNullOrWhiteSpace(Model.Search) ? "Showing all" : "You search for " +
+    Model.Search + " found") @Model.Products.TotalItemCount products
     @Html.ActionLink("Create New", "Create");
     @using (Html.BeginForm("Index", "Products", FormMethod.Get))
     {
         <label>Filter by category:</label>
-        @*@Html.DropDownList("Category", "All")*@
         @Html.DropDownListFor(vm => vm.Category, Model.CatFilterItems, "All");
+        <label>Sort By:</label>
+        @Html.DropDownListFor(vm => vm.SortBy, new SelectList(Model.Sorts, "Value",
+       "Key"), "Default")
         <input type="submit" value="Filter" />
-        @*<input type="hidden" name="Search" id="Search" value="@ViewBag.Search" />*@
         <input type="hidden" name="Search" id="Search" value="@Model.Search" />
 
     }
@@ -38,26 +42,40 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model.Products) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Category.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Price)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model.Products)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            </td>
+        </tr>
+    }
 
 </table>
+
+<div>
+    Page @(Model.Products.PageCount < Model.Products.PageNumber ? 0 :
+    Model.Products.PageNumber) of @Model.Products.PageCount
+    @Html.PagedListPager(Model.Products, page => Url.Action("Index", new
+{
+    category = @Model.Category,
+    Search = @Model.Search,
+    sortBy = @Model.SortBy,
+    page
+}))
+</div>
+

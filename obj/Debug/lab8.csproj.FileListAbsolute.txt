@@ -84,3 +84,9 @@ C:\Users\L\source\repos\lab8\lab8\obj\Debug\lab8.pdb
 C:\Users\L\source\repos\lab8\lab8\obj\Debug\lab8.Migrations.InitialCreate.resources
 C:\Users\L\source\repos\lab8\lab8\obj\Debug\lab8.csproj.GenerateResource.cache
 C:\Users\L\source\repos\lab8\lab8\obj\Debug\lab8.Migrations.UpdateDatabase.resources
+C:\Users\L\source\repos\lab8\lab8\obj\Debug\lab8.Migrations.CategoryNameValidation.resources
+C:\Users\L\source\repos\lab8\lab8\bin\PagedList.dll
+C:\Users\L\source\repos\lab8\lab8\bin\PagedList.Mvc.dll
+C:\Users\L\source\repos\lab8\lab8\bin\PagedList.xml
+C:\Users\L\source\repos\lab8\lab8\bin\PagedList.Mvc.xml
+C:\Users\L\source\repos\lab8\lab8\obj\Debug\lab8.Migrations.CampusAndStudentValidation.resources

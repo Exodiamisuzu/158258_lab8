@@ -1,4 +1,5 @@
 ﻿@model lab8.ViewModels.StudentSearchViewModel
+@using PagedList.Mvc
 
 @{
     ViewBag.Title = "Students";
@@ -12,10 +13,10 @@
     <p>
         Name: @Html.TextBoxFor(m => m.SearchString)
         Campus: @Html.DropDownListFor(m => m.CampusId, Model.Campuses, "All")
+        Sort by: @Html.DropDownListFor(m => m.SortBy, new SelectList(Model.SortOptions, "Key", "Value"))
         <input type="submit" value="Search" />
     </p>
 }
-    </p>
 
     <p>
         @Html.ActionLink("Create New", "Create")
@@ -54,5 +55,15 @@
                 </td>
             </tr>
         }
-
     </table>
+
+    <div>
+        Page @(Model.Students.PageCount < Model.Students.PageNumber ? 0 : Model.Students.PageNumber) of @Model.Students.PageCount
+        @Html.PagedListPager(Model.Students, page => Url.Action("Index", new
+        {
+            searchString = Model.SearchString,
+            campusId = Model.CampusId,
+            sortBy = Model.SortBy,
+            page
+        }))
+    </div>

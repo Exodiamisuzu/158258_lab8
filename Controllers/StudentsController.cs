@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using lab8.Data;
 using lab8.Models;
 using lab8.ViewModels;
+using PagedList;
 
 namespace lab8.Controllers
 {
@@ -17,13 +18,15 @@ namespace lab8.Controllers
         private lab8Context db = new lab8Context();
 
         // GET: Students
-        public ActionResult Index(StudentSearchViewModel model)
+        public ActionResult Index(StudentSearchViewModel model, string sortBy,int? page)
         {
             var students = db.Students.Include(s => s.UniversityCampus).AsQueryable();
+            StudentSearchViewModel studentSearchViewModel = new StudentSearchViewModel();
 
             if (!string.IsNullOrEmpty(model.SearchString))
             {
                 students = students.Where(s => s.Name.Contains(model.SearchString));
+                studentSearchViewModel.SearchString = model.SearchString;
             }
 
             if (model.CampusId.HasValue)
@@ -31,9 +34,29 @@ namespace lab8.Controllers
                 students = students.Where(s => s.UniversityCampusID == model.CampusId);
             }
 
-            model.Students = students.ToList();
-            model.Campuses = new SelectList(db.UniversityCampus, "ID", "Name");
+            studentSearchViewModel.SortBy = sortBy;
+            switch (sortBy)
+            {
+                case "NameDesc":
+                    students = students.OrderByDescending(s => s.Name);
+                    break;
+                default:
+                    students = students.OrderBy(s => s.Name);
+                    break;
+            }
 
+            //model.Students = students.ToList();
+            int pageSize = 5;
+            int pageNumber = (page ?? 1);
+
+            model.Students = students.ToPagedList(pageNumber, pageSize);
+            model.Campuses = new SelectList(db.UniversityCampus, "ID", "Name");
+            model.SortBy = sortBy;
+            model.SortOptions = new Dictionary<string, string>
+            {
+                { "NameAsc", "Name (A-Z)" },
+                { "NameDesc", "Name (Z-A)" }
+            };
             return View(model);
         }
 

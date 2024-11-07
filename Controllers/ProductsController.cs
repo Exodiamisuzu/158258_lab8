@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -9,6 +10,7 @@ using System.Web.Mvc;
 using lab8.Data;
 using lab8.Models;
 using lab8.ViewModels;
+using PagedList;
 
 namespace lab8.Controllers
 {
@@ -17,7 +19,7 @@ namespace lab8.Controllers
         private lab8Context db = new lab8Context();
 
         // GET: Products
-        public ActionResult Index(string category, string search)
+        public ActionResult Index(string category, string search,string sortBy, int? page)
         {
             //instantiate a new view model
             ProductIndexViewModel viewModel = new ProductIndexViewModel();
@@ -51,16 +53,39 @@ namespace lab8.Controllers
             if (!String.IsNullOrEmpty(category))
             {
                 products = products.Where(p => p.Category.Name == category);
+                viewModel.Category = category;
             }
-
-            //ViewBag.Category = new SelectList(categories);
-            //return View(products.ToList());
-            viewModel.Products = products;
+            //sort the results
+            switch (sortBy)
+            {
+                case "price_lowest":
+                    products = products.OrderBy(p => p.Price);
+                    break;
+                case "price_highest":
+                    products = products.OrderByDescending(p => p.Price);
+                    break;
+                default:
+                    products = products.OrderBy(p => p.Name);
+                    break;
+            }
+            viewModel.SortBy = sortBy;
+            viewModel.Sorts = new Dictionary<string, string>
+            {
+                {"Price low to high", "price_lowest" },
+                {"Price high to low", "price_highest" }
+            };
+            //viewModel.Products = products;
+            //viewModel.SortBy = sortBy;
+            const int PageItems = 3;
+            int currentPage = (page ?? 1);
+            viewModel.Products = products.ToPagedList(currentPage, PageItems);
             return View(viewModel);
         }
 
-        // GET: Products/Details/5
-        public ActionResult Details(int? id)
+
+
+    // GET: Products/Details/5
+    public ActionResult Details(int? id)
         {
             if (id == null)
             {
